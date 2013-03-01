@@ -52,13 +52,67 @@ class Deck {
 # anything ranked #1 in high/low show hand in bold. Anything else,
 # show numeric rank.
 
+proto combine (Int, @) {*}
+ 
+ multi combine (0,  @)  { [] }
+ multi combine ($,  []) { () }
+ multi combine ($n, [$head, *@tail]) {
+         map( { [$head, @^others] },
+                     combine($n-1, @tail) ),
+                         combine($n, @tail);
+ }
+  
+# Lower the score, better the low. 0 means no low.
+sub lowScore($hand, $community) {
+    # Best low score with two from your hand + the community.
+ 
+    my $low = Inf; 
+    for combine(2, $hand) -> $mycards {
+        for combine(3, $community) -> $tablecards {
+            # unique by rank, in order.
+            my @ranks = ($mycards.list, $tablecards.list).map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.uniq;
+            next if +@ranks < 5;
+            $low = min($low, [+] 1,10,100,1000,10000 Z* @ranks[0..^5]);
+        }
+    }
+    $low = 0 if $low == Inf;
+    return $low;
+}
+
 my $deck = Deck.new();
-say "HANDS";
-say "=====";
 my @hands;
-for 1..11 -> $i { @hands[$i] = $deck.deal(4) };
-for 1..11 -> $i { say "$i".fmt('%02d') ~ ": " ~ join("     ", @hands[$i]) };
+my @lows;
+# ASSUME DEAL ORDER IS IRRELEVANT
+my @community = $deck.deal(5);
+for 0..^11 -> $i {
+    @hands[$i] = $deck.deal(4);
+    @lows[$i] = lowScore(@hands[$i], @community);
+}
+
+say "HANDS";
+say "==: CARDS========LOW=HIGH=====";
+my @loworder = @lows.pairs.sort(+*.value)>>.key;
+my $rank = 0;
+my @lowranks;
+my $lastScore = 0;
+for @loworder -> $index {
+    my $score = @lows[$index];
+    if $score == 0 {
+        @lowranks[$index] = "";
+    } else {
+        if $lastScore != $score {
+            $rank++;
+        }
+        @lowranks[$index] = $rank;
+        $lastScore = $score;
+    }
+}
+
+for 1..11 -> $i {
+    say $i.fmt('%2d') ~ ": " ~ join("     ", @hands[$i-1]) ~ "  " ~
+    @lowranks[$i-1].fmt('%2s') ~ '??'.fmt('%4s') ;
+};
+
 say "\n\nCOMMUNITY";
 say "=========";
-my @community = $deck.deal(5);
 say @community;
