@@ -10,12 +10,12 @@ class Suit {
     has Color $.color;
     has   Str $.name;
     has   Str $.icon;
+    has   Int $.order;
 
     method Str {
         return color("bold " ~ $.color) ~ $.icon ~ RESET;
     }
 }
-
 
 #my @Suits =
     #Suit.new(:color(black),:name("Club"),:icon('♣')),
