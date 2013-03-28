@@ -13,7 +13,7 @@ class Suit {
     has   Int $.order;
 
     method Str {
-        return color("bold " ~ $.color) ~ $.icon ~ RESET;
+        return color("bold " ~ $.color) ~ color('bold') ~ $.icon ~ RESET;
     }
 }
 
