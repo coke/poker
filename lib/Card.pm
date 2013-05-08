@@ -17,12 +17,6 @@ class Suit {
     }
 }
 
-#my @Suits =
-    #Suit.new(:color(black),:name("Club"),:icon('♣')),
-    #Suit.new(:color(red),:name("Diamond"),:icon('♦')),
-    #Suit.new(:color(red),:name("Heart"),:icon('♥')),
-    #Suit.new(:color(black),:name("Spade"),:icon('♠'));
-#
 class Rank is Int {
     has Int $.value;
     
