@@ -52,8 +52,19 @@ class Deck {
 # anything ranked #1 in high/low show hand in bold. Anything else,
 # show numeric rank.
 
+my %iters;
+sub iterate($num, @array) {
+    # we only need to calculate all possible combinations once. 
+    my $len = @array.elems;
+    %iters{$num}{$len} //= do {
+        my @positions = 1..$len;
+        combine($num, @positions);
+    }
+   
+    return %iters{$num}{$len}.map({@array[$_]});
+}
+
 proto combine (Int, @) {*}
- 
  multi combine (0,  @)  { [] }
  multi combine ($,  []) { () }
  multi combine ($n, [$head, *@tail]) {
@@ -67,8 +78,8 @@ sub lowScore($hand, $community) {
     # Best low score with two from your hand + the community.
  
     my $low = Inf; 
-    for combine(2, $hand) -> $mycards {
-        for combine(3, $community) -> $tablecards {
+    for iterate(2, $hand) -> $mycards {
+        for iterate(3, $community) -> $tablecards {
             # unique by rank, in order.
             my @ranks = ($mycards.list, $tablecards.list).map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.uniq;
             next if +@ranks < 5;
