@@ -15,12 +15,10 @@ class Deck {
     has @.cards;
 
     submethod BUILD() {
-        for @Suits -> $suit {
-            for 1..13 -> $pips {
-                my $rank = Rank.new(:value($pips)); 
-                my $card = Card.new(:$rank, :$suit);
-                @!cards.push($card);
-            }
+        for @Suits X 1...13 -> $suit, $pips {
+            my $rank = Rank.new(:value($pips)); 
+            my $card = Card.new(:$rank, :$suit);
+            @!cards.push($card);
         }
         
         @!cards = @!cards.pick(*);
@@ -56,33 +54,41 @@ my %iters;
 sub iterate($num, @array) {
     # we only need to calculate all possible combinations once. 
     my $len = @array.elems;
-    %iters{$num}{$len} //= do {
-        my @positions = 1..$len;
-        combine($num, @positions);
+    %iters{$num}{$len} //= [combine($num, [0..^$len])];
+
+    # now use the index lists to figure out this particular set of combos
+    my $retval = [];
+    for %iters{$num}{$len}.flat -> $a {
+        $retval.push([@array[@$a]]);
     }
-   
-    return %iters{$num}{$len}.map({@array[$_]});
+    return $retval;
 }
 
 proto combine (Int, @) {*}
- multi combine (0,  @)  { [] }
- multi combine ($,  []) { () }
- multi combine ($n, [$head, *@tail]) {
-         map( { [$head, @^others] },
-                     combine($n-1, @tail) ),
-                         combine($n, @tail);
- }
+
+multi combine (0,  @)  { [] }
+multi combine ($,  []) { () }
+multi combine ($n, [$head, *@tail]) {
+    map( { [$head, @^others] }, combine($n-1, @tail)), combine($n, @tail);
+}
   
-# Lower the score, better the low. 0 means no low.
+# Lower the score, better the low, except 0 means no low.
 sub lowScore($hand, $community) {
     # Best low score with two from your hand + the community.
- 
     my $low = Inf; 
-    for iterate(2, $hand) -> $mycards {
-        for iterate(3, $community) -> $tablecards {
-            # unique by rank, in order.
-            my @ranks = ($mycards.list, $tablecards.list).map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.uniq;
-            next if +@ranks < 5;
+    my $handRanks = $hand.list.map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.uniq;
+    # need at least 2 lows in your hand for a low. 
+    return 0 if $handRanks < 2; 
+
+    my $communityRanks = $community.list.map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.uniq;
+    # need at least 3 lows in the community for a low.
+    return 0 if $communityRanks < 3; 
+
+    for iterate(2, $handRanks).lol -> $mycards {
+        for iterate(3, $communityRanks).lol -> $tablecards {
+            my @ranks = ($mycards.list, $tablecards.list).flat.sort.uniq;
+            # we might have been counterfeited
+            next if +@ranks < 5; 
             $low = min($low, [+] 1,10,100,1000,10000 Z* @ranks[0..^5]);
         }
     }
@@ -90,12 +96,14 @@ sub lowScore($hand, $community) {
     return $low;
 }
 
+note "Building a deck";
 my $deck = Deck.new();
 my @hands;
 my @lows;
-# ASSUME DEAL ORDER IS IRRELEVANT
+note "Dealing out of order";
 my @community = $deck.deal(5);
 for 0..^11 -> $i {
+    note "Dealing hand $i";
     @hands[$i] = $deck.deal(4);
     @lows[$i] = lowScore(@hands[$i], @community);
 }
