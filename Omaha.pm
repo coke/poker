@@ -3,6 +3,7 @@ BEGIN @*INC.push("lib");
 
 use Card;
 use Utils;
+use Games::Omaha;
 
 my @Suits =
     Suit.new(:order(1),:color(black),:name("Club"),:icon('♣')),
@@ -49,30 +50,6 @@ class Deck {
 # anything ranked #1 in high/low show hand in bold. Anything else,
 # show numeric rank.
 
-# Lower the score, better the low, except 0 means no low.
-sub lowScore($hand, $community) {
-    # Best low score with two from your hand + the community.
-    my $low = Inf; 
-    my $handRanks = $hand.list.map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.uniq;
-    # need at least 2 lows in your hand for a low. 
-    return 0 if $handRanks < 2; 
-
-    my $communityRanks = $community.list.map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.uniq;
-    # need at least 3 lows in the community for a low.
-    return 0 if $communityRanks < 3; 
-
-    for iterate(2, $handRanks).lol -> $mycards {
-        for iterate(3, $communityRanks).lol -> $tablecards {
-            my @ranks = ($mycards.list, $tablecards.list).flat.sort.uniq;
-            # we might have been counterfeited
-            next if +@ranks < 5; 
-            $low = min($low, [+] 1,10,100,1000,10000 Z* @ranks[0..^5]);
-        }
-    }
-    $low = 0 if $low == Inf;
-    return $low;
-}
-
 note "Building a deck";
 my $deck = Deck.new();
 my @hands;
@@ -82,7 +59,7 @@ my @community = $deck.deal(5);
 for 0..^11 -> $i {
     note "Dealing hand $i";
     @hands[$i] = $deck.deal(4);
-    @lows[$i] = lowScore(@hands[$i], @community);
+    @lows[$i] = Games::Omaha.lowScore(@hands[$i], @community);
 }
 
 say "HANDS";
