@@ -2,6 +2,7 @@ use v6;
 BEGIN @*INC.push("lib");
 
 use Card;
+use Utils;
 
 my @Suits =
     Suit.new(:order(1),:color(black),:name("Club"),:icon('♣')),
@@ -48,28 +49,6 @@ class Deck {
 # anything ranked #1 in high/low show hand in bold. Anything else,
 # show numeric rank.
 
-my %iters;
-sub iterate($num, @array) {
-    # we only need to calculate all possible combinations once. 
-    my $len = @array.elems;
-    %iters{$num}{$len} //= [combine($num, [0..^$len])];
-
-    # now use the index lists to figure out this particular set of combos
-    my $retval = [];
-    for %iters{$num}{$len}.flat -> $a {
-        $retval.push([@array[@$a]]);
-    }
-    return $retval;
-}
-
-proto combine (Int, @) {*}
-
-multi combine (0,  @)  { [] }
-multi combine ($,  []) { () }
-multi combine ($n, [$head, *@tail]) {
-    map( { [$head, @^others] }, combine($n-1, @tail)), combine($n, @tail);
-}
-  
 # Lower the score, better the low, except 0 means no low.
 sub lowScore($hand, $community) {
     # Best low score with two from your hand + the community.
