@@ -1,5 +1,3 @@
-# Bits of a card.  use v6;
-
 use v6;
 BEGIN @*INC.push("lib");
 
