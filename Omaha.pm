@@ -88,4 +88,4 @@ for 1..11 -> $i {
 
 say "\n\nCOMMUNITY";
 say "=========";
-say @community;
+say ~@community;
