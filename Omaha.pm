@@ -50,14 +50,11 @@ class Deck {
 # anything ranked #1 in high/low show hand in bold. Anything else,
 # show numeric rank.
 
-note "Building a deck";
 my $deck = Deck.new();
 my @hands;
 my @lows;
-note "Dealing out of order";
 my @community = $deck.deal(5);
 for 0..^11 -> $i {
-    note "Dealing hand $i";
     @hands[$i] = $deck.deal(4);
     @lows[$i] = Games::Omaha.lowScore(@hands[$i], @community);
 }
