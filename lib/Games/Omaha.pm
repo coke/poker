@@ -1,9 +1,6 @@
-
 use Utils;
 
-
 class Games::Omaha {
-
     # Lower the score, better the low, except 0 means no low.
     method lowScore($hand, $community) {
         # Best low score with two from your hand + the community.
