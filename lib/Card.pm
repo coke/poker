@@ -1,43 +1,33 @@
-# Bits of a card.  use v6;
-
-use v6;
-
+use Rank;
 use Term::ANSIColor;
 
-enum Color <red black>;
+class Card {
 
-class Suit {
-    has Color $.color;
-    has   Str $.name;
-    has   Str $.icon;
-    has   Int $.order;
+    enum Color <red black>;
 
-    method Str {
-        return color("bold " ~ $.color) ~ color('bold') ~ $.icon ~ RESET;
-    }
-}
-
-class Rank is Int {
-    has Int $.value;
+    class Suit {
+        has Color $.color;
+        has   Str $.name;
+        has   Str $.icon;
+        has   Int $.order;
     
-    method Str {
-        return "TYPE OBJECT" unless defined($.value);
-        given $.value {
-            when 1  { return "A" }
-            when 13 { return "K" }
-            when 12 { return "Q" }
-            when 11 { return "J" }
-            when 10 { return "T" }
-            default { return $_ }
+        method Str {
+            return color("bold " ~ $.color) ~ color('bold') ~ $.icon ~ RESET;
         }
     }
-}
-
-class Card {
+    
+    method Suits() {
+        return 
+            Suit.new(:order(1),:color(black),:name("Club"),:icon('♣')),
+            Suit.new(:order(2),:color(red),:name("Diamond"),:icon('♦')),
+            Suit.new(:order(3),:color(red),:name("Heart"),:icon('♥')),
+            Suit.new(:order(4),:color(black),:name("Spade"),:icon('♠'));
+    }
+    
     has Rank $.rank;
     has Suit $.suit;
-
+    
     method Str {
         return ~$.rank ~ $.suit;
     }
-}
+} 

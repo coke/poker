@@ -1,33 +1,9 @@
 use v6;
 BEGIN @*INC.push("lib");
 
-use Card;
+use Deck;
 use Utils;
 use Games::Omaha;
-
-my @Suits =
-    Suit.new(:order(1),:color(black),:name("Club"),:icon('♣')),
-    Suit.new(:order(2),:color(red),:name("Diamond"),:icon('♦')),
-    Suit.new(:order(3),:color(red),:name("Heart"),:icon('♥')),
-    Suit.new(:order(4),:color(black),:name("Spade"),:icon('♠'));
-
-class Deck {
-    has @.cards;
-
-    submethod BUILD() {
-        for @Suits X 1...13 -> $suit, $pips {
-            my $rank = Rank.new(:value($pips)); 
-            my $card = Card.new(:$rank, :$suit);
-            @!cards.push($card);
-        }
-        
-        @!cards = @!cards.pick(*);
-    }
-
-    method deal(Int $count) {
-        @!cards.splice(0, $count);
-    }
-}
 
 # in our output, show hand, then have rank of hands for high low.
 # anything ranked #1 in high/low show hand in bold. Anything else,
