@@ -42,6 +42,6 @@ for 1..11 -> $i {
     @lowranks[$i-1].fmt('%2s') ~ '??'.fmt('%4s') ;
 };
 
-say "\n\nCOMMUNITY";
-say "=========";
-say ~@community;
+say "";
+say "FLOP===========TURN=RIVER";
+say @community.join("   ");;
