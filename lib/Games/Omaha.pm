@@ -5,11 +5,11 @@ class Games::Omaha {
     method lowScore($hand, $community) {
         # Best low score with two from your hand + the community.
         my $low = Inf; 
-        my $handRanks = $hand.list.map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.unique;
+        my $handRanks = $hand.list.map(-> $x {$x.rank}).grep(-> $x { $x <= 8 }).sort.unique;
         # need at least 2 lows in your hand for a low. 
         return 0 if $handRanks < 2; 
 
-        my $communityRanks = $community.list.map(-> $x {$x.rank.value}).grep(-> $x { $x <= 8 }).sort.unique;
+        my $communityRanks = $community.list.map(-> $x {$x.rank}).grep(-> $x { $x <= 8 }).sort.unique;
         # need at least 3 lows in the community for a low.
         return 0 if $communityRanks < 3; 
 
