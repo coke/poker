@@ -1,2 +1,2 @@
 run:
-	perl6 Omaha.pm
+	PERL6LIB=lib perl6 Omaha.pm

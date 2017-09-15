@@ -1,5 +1,4 @@
 use v6;
-BEGIN @*INC.push("lib");
 
 use Deck;
 use Utils;
