@@ -1,4 +1,4 @@
-use Term::ANSIColor;
+use Terminal::ANSIColor;
 
 enum Color <red black>;
 
