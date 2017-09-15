@@ -1,4 +1,6 @@
 use Card;
+use Rank;
+use Suit;
 
 class Deck {
     has @.cards;
