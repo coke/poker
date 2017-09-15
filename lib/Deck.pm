@@ -6,7 +6,7 @@ class Deck {
 
     submethod BUILD() {
         for Suit.all X (1..13) -> ($suit, $pips) {
-            my $card = Card.new(:$pips, :$suit);
+            my $card = Card.new(:rank($pips), :$suit);
             @!cards.push($card);
         }
         

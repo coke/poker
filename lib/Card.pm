@@ -5,7 +5,7 @@ class Card {
     has Suit $.suit;
     
     method Str {
-        do given $.rank {
+        return do given $.rank {
             when 1  { "A" }
             when 13 { "K" }
             when 12 { "Q" }
