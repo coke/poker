@@ -9,7 +9,7 @@ sub iterate($num, @array) is export {
     for %iters{$num}{$len}.flat -> $a {
         $retval.push([@array[@$a]]);
     }
-    return $retval;
+    $retval;
 }
 
 proto combine (Int, @) {*}

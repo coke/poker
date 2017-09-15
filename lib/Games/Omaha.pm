@@ -22,7 +22,7 @@ class Games::Omaha {
             }
         }
         $low = 0 if $low == Inf;
-        return $low;
+        $low;
     }
 }
 
