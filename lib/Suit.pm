@@ -2,8 +2,6 @@ use Terminal::ANSIColor;
 
 enum Color <red black>;
 
-enum Swuit <♣ ♦ ♥ ♠>;
-
 class Suit {
     has Color $.color;
     has   Str $.name;
