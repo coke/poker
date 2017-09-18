@@ -1,0 +1,12 @@
+{
+    "perl" : "6.c",
+    "name" : "Games::Poker::Omaha",
+    "version" : "0.0.11",
+    "description" : "Play/Test Omaha Poker.",
+    "authors" : [ "Will “Coke” Coleda" ],
+    "license" : "Artistic-2.0",
+    "provides" : {},
+    "depends" : [ "Terminal::ANSIColor" ],
+    "resources" : [ ],
+    "source-url" : "git://github.com/coke/poker.git"
+}
