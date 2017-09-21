@@ -18,6 +18,8 @@ class Hand::Omaha {
         my $base; my $modifier;
 
         # straight/royal flush.
+        my $straight = self!is-straight;
+        my $flush    = self!is-flush;
         $base = 8;
 
         # 4 of a kind
@@ -27,12 +29,14 @@ class Hand::Omaha {
         $base = 6;
 
         # flush
-        if self!is-flush {
+        if $flush {
             return Score.new(:values(5, |self!rank(@.cards)));
         }
 
         # straight     
-        $base = 4;
+        if $straight {
+            return Score.new(:values(4, $straight));
+        }
 
         # 3 of a kind
         $base = 3;
@@ -51,11 +55,27 @@ class Hand::Omaha {
         @cards.map(*.rank).map({$_==1??14!!$_}).sort(-*);
     }
   
-    method !is-flush {
+    method !is-flush(--> Bool) {
         [eq] @.cards.map(*.suit.name);
     }
 
-    method !is-straight {
+    method !is-straight(--> Int) {
+        # 0 means no straight.
+        # Positive value indicates the highest card in the straight.
+
+        # with A low, are all our ranks sequential?
+        # if they are sequential, we can reverse the list, add the index
+        # at each point to the value, and they will all have the same sum
+ 
+        my @ranks = @.cards.map(*.rank).sort(-*);
+        my $low = [==] @ranks.kv.rotor(2)>>.sum;
+        return @ranks[0] if $low;
         
+        # what about with A high? 
+        @ranks = @.cards.map(*.rank).map({$_==1??14!!$_}).sort(-*);
+        my $high = [==] @ranks.kv.rotor(2)>>.sum; 
+        return 14 if $high;
+
+        return 0;
     }
 } 
