@@ -1,7 +1,7 @@
 use Hand::Omaha;
 
 class Games::Omaha {
-    method lowScore($hand, $community) {
+    method low-score($hand, $community) {
         # Best low score with two from your hand + the community.
         my $best;
         for $hand.combinations(2) -> $mycards {

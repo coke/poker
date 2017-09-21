@@ -15,7 +15,7 @@ my $player-count = 11;
 
 for 0..^$player-count -> $i {
     @hands[$i] = $deck.deal(4);
-    @lows[$i] = Games::Omaha.lowScore(@hands[$i], @community);
+    @lows[$i] = Games::Omaha.low-score(@hands[$i], @community);
 }
 
 say "==:=HANDS========LOW=HIGH=====";
