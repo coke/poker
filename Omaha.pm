@@ -25,7 +25,7 @@ my @lowranks;
 my $lastScore = 0;
 for @loworder -> $index {
     my $score = @lows[$index];
-    if $score == 0 {
+    if $score == Inf {
         @lowranks[$index] = "";
     } else {
         if $lastScore != $score {
