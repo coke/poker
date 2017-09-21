@@ -20,7 +20,9 @@ class Hand::Omaha {
         # straight/royal flush.
         my $straight = self!is-straight;
         my $flush    = self!is-flush;
-        $base = 8;
+        if $straight && $flush {
+            return Score.new(:values(8, $straight));
+        }
 
         # 4 of a kind
         $base = 7;
