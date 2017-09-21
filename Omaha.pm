@@ -11,13 +11,14 @@ my $deck = Deck.new();
 my @hands;
 my @lows;
 my @community = $deck.deal(5);
-for 0..^11 -> $i {
+my $player-count = 11;
+
+for 0..^$player-count -> $i {
     @hands[$i] = $deck.deal(4);
     @lows[$i] = Games::Omaha.lowScore(@hands[$i], @community);
 }
 
-say "HANDS";
-say "==: CARDS========LOW=HIGH=====";
+say "==:=HANDS========LOW=HIGH=====";
 my @loworder = @lows.pairs.sort(+*.value)>>.key;
 my $rank = 0;
 my @lowranks;
@@ -35,7 +36,7 @@ for @loworder -> $index {
     }
 }
 
-for 1..11 -> $i {
+for 1..$player-count -> $i {
     say $i.fmt('%2d') ~ ": " ~ join("     ", @hands[$i-1]) ~ "  " ~
     @lowranks[$i-1].fmt('%2s') ~ '??'.fmt('%4s') ;
 };
