@@ -1,7 +1,6 @@
 use v6;
 
 use Deck;
-use Utils;
 use Games::Omaha;
 
 # in our output, show hand, then have rank of hands for high low.

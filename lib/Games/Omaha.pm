@@ -1,5 +1,3 @@
-use Utils;
-
 class Games::Omaha {
     # Lower the score, better the low, except 0 means no low.
     method lowScore($hand, $community) {
@@ -13,8 +11,8 @@ class Games::Omaha {
         # need at least 3 lows in the community for a low.
         return 0 if $communityRanks < 3; 
 
-        for iterate(2, $handRanks) -> $mycards {
-            for iterate(3, $communityRanks) -> $tablecards {
+        for $handRanks.combinations(2) -> $mycards {
+            for $communityRanks.combinations(3) -> $tablecards {
                 my @ranks = ($mycards.list, $tablecards.list).flat.sort.unique;
                 # we might have been counterfeited
                 next if +@ranks < 5; 
