@@ -62,21 +62,22 @@ class Hand::Omaha {
     }
 
     method !is-straight(--> Int) {
+        sub ordered(@ranks) {
+           [&&] @ranks.sort.rotor(2 => -1).map({$_[0]+1==$_[1]});
+        }
+ 
         # 0 means no straight.
         # Positive value indicates the highest card in the straight.
 
         # with A low, are all our ranks sequential?
         # if they are sequential, we can reverse the list, add the index
         # at each point to the value, and they will all have the same sum
- 
-        my @ranks = @.cards.map(*.rank).sort(-*);
-        my $low = [==] @ranks.kv.rotor(2)>>.sum;
-        return @ranks[0] if $low;
+
+        my @ranks = @.cards.map(*.rank);
+        return @ranks[0] if ordered(@ranks);
         
         # what about with A high? 
-        @ranks = @.cards.map(*.rank).map({$_==1??14!!$_}).sort(-*);
-        my $high = [==] @ranks.kv.rotor(2)>>.sum; 
-        return 14 if $high;
+        return 14 if ordered(@.cards.map(*.rank).map({$_==1??14!!$_}));
 
         return 0;
     }
