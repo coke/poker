@@ -3,54 +3,61 @@ use Score;
 
 class Hand::Omaha {
     has Card @.cards;
+    has Str $.name;
+    has Score $.score;
+
+    method Str {
+        $!name //= "";
+        $!name ~ " [" ~ $!score ~ "]";
+    }
 
     # lower the better; Inf means no low
     method low-score {
         my $score = 0;
         my $count = 0;
         my @values = @.cards.map(*.rank).sort.grep(* < 8).unique;
-        return Score.new(:values(Inf)) if @values < 5;
-        return Score.new(:values(@values));
+        $!score = Score.new(:values(Inf)) if @values < 5;
+        $!score = Score.new(:values(@values));
+        self;
     }
 
     # higher the better;
     method high-score {
         my $base; my $modifier;
 
-        # straight/royal flush.
         my $straight = self!is-straight;
         my $flush    = self!is-flush;
+        my $g        = self!groupings;
+
         if $straight && $flush {
-            return Score.new(:values(8, $straight));
+            $!name = "straight flush";
+            $!score = Score.new(:values(8, $straight));
+        } elsif $g.get-count eqv [4,1] {
+            $!name = "4 of a kind";
+            $!score = Score.new(:values(7, |$g.get-score));
+        } elsif $g.get-count eqv [3,2] {
+            $!name = "full house";
+            $!score = Score.new(:values(6, |$g.get-score));
+        } elsif $flush {
+            $!name = "flush";
+            $!score = Score.new(:values(5, |$g.get-score));
+        } elsif $straight {
+            $!name = "straight";
+            $!score = Score.new(:values(4, |$g.get-score));
+        } elsif $g.get-count eqv [3,1,1] {
+            $!name = "3 of a kind";
+            $!score = Score.new(:values(3, |$g.get-score));
+        } elsif $g.get-count eqv [2,2,1] {
+            $!name = "2 pair";
+            $!score = Score.new(:values(2, |$g.get-score));
+        } elsif $g.get-count eqv [2,2,1] {
+            $!name = "pair";
+            $!score = Score.new(:values(1, |$g.get-score));
+        } else {
+            $!name = "high card";
+            $!score = Score.new(:values(0, |$g.get-score));
         }
-
-        # 4 of a kind
-        $base = 7;
-
-        # full house
-        $base = 6;
-
-        # flush
-        if $flush {
-            return Score.new(:values(5, |self!rank(@.cards)));
-        }
-
-        # straight     
-        if $straight {
-            return Score.new(:values(4, $straight));
-        }
-
-        # 3 of a kind
-        $base = 3;
-
-        # 2 pair
-        $base = 2;
-
-        # 1 pair
-        $base = 1;
-
-        # 0: high card
-        Score.new(:values(0, |self!rank(@.cards)));
+        self;
     }
  
     method !rank(@cards) {
@@ -81,4 +88,29 @@ class Hand::Omaha {
 
         return 0;
     }
+
+    method !groupings {
+        my %counts;
+        my @ranks = @.cards.map({$_.rank == 1 ?? 14 !! $_.rank});
+        @ranks.map({%counts{$_}++});
+
+        class :: {
+            method get-count {
+                my @counts = %counts.values.sort(-*);
+            }
+            method get-score {
+	        my @scores;
+                for self.get-count().unique -> $count {
+                    my @sub-scores;
+                    for %counts.keys -> $key {
+                        next unless %counts{$key} == $count;
+			push @sub-scores, +$key;
+		    }
+                    push @scores, |@sub-scores.sort(-*);
+                }
+                @scores;
+            }
+        };
+    }
+
 } 

@@ -6,6 +6,7 @@ class Score {
     }
 
     method is-inf {
+       return False unless @.values;
        @.values[0] == Inf;
     }
 

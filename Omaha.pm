@@ -17,20 +17,20 @@ my $player-count = 11;
 
 for 0..^$player-count -> $i {
     @hands[$i] = $deck.deal(4);
-    @lows[$i] = Games::Omaha.low-score(@hands[$i], @community);
-    @highs[$i] = Games::Omaha.high-score(@hands[$i], @community);
+    @lows[$i] = Games::Omaha.low-hand(@hands[$i], @community);
+    @highs[$i] = Games::Omaha.high-hand(@hands[$i], @community);
 }
 
 say "==:=HANDS========LOW=HIGH=====";
-my @loworder = @lows.pairs.sort({Score.cmp($^a.value,$^b.value)})>>.key;
-my @highorder = @highs.pairs.sort({Score.cmp($^b.value,$^a.value)})>>.key;
+my @loworder = @lows.pairs.sort({Score.cmp($^a.value.score,$^b.value.score)})>>.key;
+my @highorder = @highs.pairs.sort({Score.cmp($^b.value.score,$^a.value.score)})>>.key;
 my $rank = 0;
 my @lowranks;
 my @highranks;
 my $lastScore = 0;
 for @loworder -> $index {
     my $score = @lows[$index];
-    if $score.is-inf {
+    if $score.score.is-inf {
         @lowranks[$index] = "";
     } else {
         if $lastScore ne ~$score {
@@ -54,9 +54,10 @@ for @highorder -> $index {
 
 for 1..$player-count -> $i {
     say $i.fmt('%2d') ~ ": " ~ join("     ", @hands[$i-1]) ~ "  " ~
-    @lowranks[$i-1].fmt('%2s') ~ @highranks[$i-1].fmt('%4s');
+    @lowranks[$i-1].fmt('%2s') ~ @highranks[$i-1].fmt('%4s') ~ "     " ~
+    @highs[$i-1];
 };
 
 say "";
-say "FLOP===========TURN=RIVER";
-say @community.join("   ");;
+say "FLOP=================TURN=RIVER";
+say "TABLE: " ~ @community.join("   ");
