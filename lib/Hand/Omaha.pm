@@ -15,9 +15,12 @@ class Hand::Omaha {
     method low-score {
         my $score = 0;
         my $count = 0;
-        my @values = @.cards.map(*.rank).sort.grep(* < 8).unique;
-        $!score = Score.new(:values(Inf)) if @values < 5;
-        $!score = Score.new(:values(@values));
+        my @values = @.cards.map(*.rank).sort.grep(* <= 8).unique;
+        if @values.elems < 5 {
+            $!score = Score.new(:values(Inf));
+        } else {
+            $!score = Score.new(:values(@values));
+        }
         self;
     }
 
